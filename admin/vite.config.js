@@ -1,0 +1,49 @@
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { fileURLToPath, URL } from 'node:url'
+import { viteMockServe } from 'vite-plugin-mock'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+import Icons from 'unplugin-icons/vite'
+
+
+// https://vitejs.dev/config/
+export default defineConfig(({ command }) => {
+  let prodMock = true
+  return {
+    resolve: {
+      alias: [
+        { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) }
+      ]
+    },
+    plugins: [
+      vue(),
+      mock(command, prodMock),
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+      }),
+      vueSetupExtend(),
+      Icons(),
+    ],
+    server: {
+      host: '0.0.0.0'
+    }
+  }
+})
+
+const mock = (command, prodMock) => {
+  return viteMockServe({
+    mockPath: 'mock',
+    enable: command === 'serve',
+    prodEnabled: command !== 'serve' && prodMock,
+    injectCode: `
+      import { setupProdMockServer } from './mockProdServer'
+      setupProdMockServer()
+    `,
+  })
+}

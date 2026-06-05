@@ -1,0 +1,124 @@
+<template>
+  <el-card style="margin:10px">
+    <el-form :inline="false" :model="table.queryParams">
+      <div class="search">
+        <div class="search-item">
+          <el-input v-model="table.queryParams.name" :placeholder="$t('name')" clearable></el-input>
+        </div>
+        <div class="search-item">
+          <permission-group-select v-model="table.queryParams.pg_id" style="width: 200px"></permission-group-select>
+        </div>
+        <div class="search-item">
+          <guard-select v-model="table.queryParams.guard_name" :placeholder="$t('guardName')" style="width: 200px"></guard-select>
+        </div>
+        <div class="search-item">
+          <el-button type="primary" @click="requestData">{{ $t('search') }}</el-button>
+        </div>
+      </div>
+    </el-form>
+  </el-card>
+  <el-card style="margin:10px">
+    <table-action :title="$t('meta.title.permission')">
+      <template #action>
+        <el-button type="primary" v-permission="'permission-group.index'"  @click="permissionGroupDrawerRef.open()">{{ $t('meta.title.permissionGroup') }}</el-button>
+        <el-button type="primary" v-permission="'permission.store'" @click="handleAdd" :icon="Plus">{{ $t('add') }}</el-button>
+      </template>
+    </table-action>
+    <el-table
+            :data="table.data"
+            v-loading="table.loading"
+            border
+            style="width: 100%">
+      <el-table-column
+              prop="name"
+              :label="$t('name')">
+      </el-table-column>
+      <el-table-column
+              prop="display_name"
+              :label="$t('displayName')">
+      </el-table-column>
+      <el-table-column
+              prop="guard_name"
+              :label="$t('guardName')">
+      </el-table-column>
+      <el-table-column
+              prop="group.name"
+              :label="$t('permissionGroup')">
+      </el-table-column>
+      <el-table-column
+              prop="icon"
+              :label="$t('icon')">
+      </el-table-column>
+      <el-table-column
+              fixed="right"
+              width="200px"
+              :label="$t('actions')"
+              >
+        <template #default="scope">
+          <el-button
+                  v-permission="'permission.update'"
+                  type="primary"
+                  :link="true"
+                  @click="handleEdit(scope.row)">{{ $t('edit') }}</el-button>
+          <el-popconfirm  :title="$t('confirmDelete')" @confirm="handleDelete(scope.$index, scope.row)">
+            <template #reference>
+              <el-button v-permission="'permission.destroy'"  type="danger" :link="true">{{ $t('delete') }}</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination class="pagination-right"
+                   @current-change="requestData"
+                   v-model:currentPage="table.pagination.currentPage"
+                   :page-size="table.pagination.pageSize"
+                   layout="total, prev, pager, next, jumper"
+                   :total="table.pagination.total">
+    </el-pagination>
+  </el-card>
+  <permission-form-drawer ref="permissionFormDrawerRef" @success="requestData"></permission-form-drawer>
+  <permission-group-drawer ref="permissionGroupDrawerRef"></permission-group-drawer>
+</template>
+
+<script setup name="permissionIndex">
+import { deletePermission, getPermissionList } from '@/api/permission'
+import GuardSelect from '@/components/Select/GuardSelect.vue'
+import PermissionGroupSelect from "@/components/Select/PermissionGroupSelect.vue"
+import TableAction from '@/components/Table/TableAction.vue'
+import { ref, onMounted } from 'vue'
+import PermissionFormDrawer from './components/PermissionFormDrawer.vue'
+import PermissionGroupDrawer from './components/PermissionGroupDrawer.vue'
+import { tableDefaultData, tableDataFormat } from '@/utils/table'
+import notice from '@/utils/notice'
+import { Plus, Search } from '@element-plus/icons-vue'
+const permissionFormDrawerRef = ref(null)
+const permissionGroupDrawerRef = ref(null)
+const table = tableDefaultData()
+
+const requestData = () => {
+  table.loading = true
+  getPermissionList(table.getQueryParams()).then( response => {
+    tableDataFormat(response, table)
+  })
+}
+
+onMounted(() => {
+  requestData()
+})
+
+const handleAdd = () => {
+  permissionFormDrawerRef.value.open('add')
+}
+
+const handleEdit = (row) => {
+  permissionFormDrawerRef.value.open('edit', row)
+}
+
+const handleDelete = (index, row) => {
+  deletePermission(row.id).then(() => {
+    notice.deleteSuccess()
+    table.data.splice(index, 1)
+  })
+}
+
+</script>

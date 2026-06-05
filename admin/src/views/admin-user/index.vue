@@ -1,0 +1,126 @@
+<template>
+  <el-card style="margin:10px;">
+    <el-form :inline="false" :model="table.queryParams">
+      <div class="search">
+        <div class="search-item">
+          <el-input v-model="table.queryParams.name" :placeholder="$t('name')" clearable></el-input>
+        </div>
+        <div class="search-item">
+          <el-input v-model="table.queryParams.username" :placeholder="$t('username')" clearable></el-input>
+        </div>
+        <div class="search-item">
+          <el-button type="primary" @click="requestData">{{ $t('search') }}</el-button>
+        </div>
+      </div>
+    </el-form>
+  </el-card>
+  <el-card style="margin:10px;">
+    <table-action :title="$t('meta.title.adminUser')">
+      <template #action>
+        <el-button type="primary" v-permission="'admin-user.store'"  @click="adminUserFormDialogRef.open('add')">{{ $t('add') }}</el-button>
+      </template>
+    </table-action>
+    <el-table
+            :data="table.data"
+            v-loading="table.loading"
+            border
+            style="width: 100%">
+      <el-table-column
+              prop="name"
+              :label="$t('name')">
+      </el-table-column>
+      <el-table-column
+              prop="username"
+              :label="$t('username')">
+      </el-table-column>
+      <el-table-column
+              :label="$t('status')">
+        <template #default="scope">
+          <el-tag type="success" v-if="scope.row.status">启用</el-tag>
+          <el-tag type="danger" v-if="!scope.row.status">禁用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+              prop="created_at"
+              :label="$t('createdAt')">
+      </el-table-column>
+      <el-table-column
+              prop="updated_at"
+              :label="$t('updatedAt')">
+      </el-table-column>
+      <el-table-column
+              fixed="right"
+              width="200px"
+              :label="$t('actions')"
+              >
+        <template #default="scope">
+          <el-button
+                  v-permission="'admin-user.update'"
+                  type="primary"
+                  :link="true"
+                  @click="handleEdit(scope.row)">{{ $t('edit') }}</el-button>
+          <el-button
+                  v-permission="'admin-user.assign-roles'"
+                  type="primary"
+                  :link="true"
+                  @click="handleAssignRole(scope.row)">{{ $t('assignRole') }}</el-button>
+          <el-popconfirm :title="$t('confirmDelete')" @confirm="handleDelete(scope.$index, scope.row)">
+            <template #reference>
+              <el-button v-permission="'admin-user.destroy'" type="danger" :link="true">{{ $t('delete') }}</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination class="pagination-right"
+                   @current-change="requestData"
+                   v-model="table.pagination.currentPage"
+                   :page-size="table.pagination.pageSize"
+                   layout="total, prev, pager, next, jumper"
+                   :total="table.pagination.total">
+    </el-pagination>
+  </el-card>
+  <user-assign-role ref="userAssignRoleRef"></user-assign-role>
+  <admin-user-form-dialog ref="adminUserFormDialogRef" @success="requestData"></admin-user-form-dialog>
+</template>
+
+<script setup name="adminUserIndex">
+import { getAdminUserList, deleteAdminUser } from '@/api/adminUser'
+import UserAssignRole from '@/components/User/AssignRole.vue'
+import TableAction from '@/components/Table/TableAction.vue'
+import { ref, onMounted } from 'vue'
+import AdminUserFormDialog from './components/AdminUserFormDialog.vue'
+import { tableDataFormat, tableDefaultData } from '@/utils/table'
+import notice from '@/utils/notice'
+const adminUserFormDialogRef = ref(null)
+const userAssignRoleRef = ref(null)
+const table = tableDefaultData()
+
+const handleEdit = (row) => {
+  adminUserFormDialogRef.value.open('edit', row)
+}
+
+const requestData = () => {
+  table.loading = true
+  getAdminUserList(table.getQueryParams()).then( response => {
+    tableDataFormat(response, table)
+  })
+}
+
+onMounted(() => {
+  requestData()
+})
+
+const handleDelete = (index, row) => {
+  deleteAdminUser(row.id).then( () => {
+    notice.deleteSuccess()
+    table.data.splice(index, 1)
+  })
+}
+
+const handleAssignRole = (row) => {
+  userAssignRoleRef.value.open(row.id, 'admin')
+}
+
+
+</script>

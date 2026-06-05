@@ -1,0 +1,17 @@
+{
+  "name": "study-tools-server",
+  "version": "1.0.0",
+  "description": "Study Tools Server - Koa + MySQL",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "node src/app.js",
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "koa": "^2.15.0",
+    "@koa/router": "^12.0.1",
+    "mysql2": "^3.9.0",
+    "koa-bodyparser": "^4.4.1",
+    "koa-cors": "^0.0.16"
+  }
+}
