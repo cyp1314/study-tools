@@ -2,6 +2,7 @@ const jimengService = require('../services/jimeng');
 const imageRecordService = require('../services/imageRecord');
 const qiniuUploader = require('../utils/qiniu');
 const pointService = require('../services/pointService');
+const productService = require('../services/productService');
 const config = require('../config');
 const { buildPrompt, getPromptConfig, promptConfig } = require('../config/prompts');
 const { success, AppError } = require('../middleware/response');
@@ -16,12 +17,24 @@ class ImageController {
    * GET /api/v1/image/types
    */
   async getTypes(ctx) {
-    const types = Object.entries(promptConfig).map(([key, cfg]) => ({
-      type: key,
-      description: cfg.description,
-      defaultPrompt: cfg.defaultPrompt,
-    }));
-    success(ctx, types);
+    // 优先从数据库读取产品列表
+    try {
+      const products = await productService.getActiveList();
+      const types = products.map(p => ({
+        type: p.type,
+        description: p.description,
+        defaultPrompt: p.default_prompt,
+      }));
+      success(ctx, types);
+    } catch (_) {
+      // 降级到 prompts.js
+      const types = Object.entries(promptConfig).map(([key, cfg]) => ({
+        type: key,
+        description: cfg.description,
+        defaultPrompt: cfg.defaultPrompt,
+      }));
+      success(ctx, types);
+    }
   }
 
   /**
@@ -38,11 +51,20 @@ class ImageController {
       throw new AppError('type参数必填', -1, 400);
     }
 
-    // 验证type有效性
+    // 验证type有效性 + 构建完整提示词（优先从DB读取）
+    let fullPrompt = '';
     try {
-      getPromptConfig(type);
-    } catch (err) {
-      throw new AppError(err.message, -1, 400);
+      const product = await productService.findByType(type);
+      if (!product) throw new Error(`未找到产品: ${type}`);
+      fullPrompt = productService.buildPrompt(product, prompt);
+    } catch (dbErr) {
+      // 降级到 prompts.js
+      try {
+        const result = buildPrompt(type, prompt);
+        fullPrompt = result.prompt;
+      } catch (err) {
+        throw new AppError(err.message, -1, 400);
+      }
     }
 
     // 扣减积分（登录用户）
@@ -53,9 +75,6 @@ class ImageController {
         throw new AppError(err.message, -1, 400);
       }
     }
-
-    // 构建完整提示词
-    const { prompt: fullPrompt } = buildPrompt(type, prompt);
 
     // 创建数据库记录（pending状态）
     let recordId;
@@ -134,7 +153,19 @@ class ImageController {
       throw new AppError('type参数必填', -1, 400);
     }
 
-    const { prompt: fullPrompt } = buildPrompt(type, prompt);
+    let fullPrompt = '';
+    try {
+      const product = await productService.findByType(type);
+      if (!product) throw new Error(`未找到产品: ${type}`);
+      fullPrompt = productService.buildPrompt(product, prompt);
+    } catch (dbErr) {
+      try {
+        const result = buildPrompt(type, prompt);
+        fullPrompt = result.prompt;
+      } catch (err) {
+        throw new AppError(err.message, -1, 400);
+      }
+    }
 
     // 创建数据库记录
     let recordId;

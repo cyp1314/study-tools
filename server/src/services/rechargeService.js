@@ -1,21 +1,25 @@
 const crypto = require('crypto');
 const pool = require('../db/mysql');
 const pointService = require('./pointService');
+const rechargePackageService = require('./rechargePackageService');
 
 /**
  * 充值服务
  */
 class RechargeService {
   /**
-   * 充值套餐列表
+   * 充值套餐列表（仅启用的，C端使用）
    */
-  getPackages() {
-    return [
-      { id: 1, points: 100, amount: 9.90, label: '100积分' },
-      { id: 2, points: 500, amount: 39.90, label: '500积分', bonus: 50 },
-      { id: 3, points: 1000, amount: 69.90, label: '1000积分', bonus: 150 },
-      { id: 4, points: 3000, amount: 179.90, label: '3000积分', bonus: 500 },
-    ];
+  async getPackages() {
+    const list = await rechargePackageService.getActiveList();
+    return list.map((pkg) => ({
+      id: pkg.id,
+      name: pkg.name,
+      points: pkg.points,
+      bonus: pkg.bonus,
+      amount: parseFloat(pkg.amount),
+      label: pkg.bonus > 0 ? `${pkg.name}+${pkg.bonus}赠送` : pkg.name,
+    }));
   }
 
   /**
@@ -25,8 +29,10 @@ class RechargeService {
    * @returns {{ orderNo, points, amount }}
    */
   async createOrder(userId, packageId) {
-    const pkg = this.getPackages().find((p) => p.id === packageId);
+    // 从数据库查询套餐
+    const pkg = await rechargePackageService.findById(packageId);
     if (!pkg) throw new Error('无效的充值套餐');
+    if (!pkg.is_active) throw new Error('该套餐已下架');
 
     const orderNo = this._generateOrderNo();
     const totalPoints = pkg.points + (pkg.bonus || 0);
@@ -37,7 +43,7 @@ class RechargeService {
     );
 
     console.log(`[Recharge] Order created: ${orderNo}, userId=${userId}, points=${totalPoints}, amount=${pkg.amount}`);
-    return { orderNo, points: totalPoints, amount: pkg.amount };
+    return { orderNo, points: totalPoints, amount: parseFloat(pkg.amount) };
   }
 
   /**

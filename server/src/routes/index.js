@@ -11,6 +11,8 @@ router.use('/image', require('./image'));
 router.use('/auth', require('./auth'));
 router.use('/user', require('./user'));
 router.use('/point', require('./point'));
+router.use('/admin', require('./admin'));
+router.use('/business', require('./business'));
 // router.use('/material', require('./material'));
 // router.use('/hanzi', require('./hanzi'));
 // router.use('/poem', require('./poem'));

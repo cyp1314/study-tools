@@ -65,7 +65,7 @@ class PointController {
    * GET /api/v1/point/recharge/packages
    */
   async getRechargePackages(ctx) {
-    const packages = rechargeService.getPackages();
+    const packages = await rechargeService.getPackages();
     success(ctx, packages);
   }
 

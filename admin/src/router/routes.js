@@ -7,6 +7,16 @@ import adminUser from '@/views/admin-user/routes'
 import menu from '@/views/menu/routes'
 import role from '@/views/role/routes'
 import permission from '@/views/permission/routes'
+import rechargePackage from '@/views/recharge-package/routes'
+import userManage from '@/views/user-manage/routes'
+import imageRecord from '@/views/image-record/routes'
+import pointLog from '@/views/point-log/routes'
+import signinConfig from '@/views/signin-config/routes'
+import signinRecord from '@/views/signin-record/routes'
+import rechargeOrder from '@/views/recharge-order/routes'
+import banner from '@/views/banner/routes'
+import category from '@/views/category/routes'
+import product from '@/views/product/routes'
 
 export default [
   {
@@ -33,6 +43,16 @@ export default [
       ...menu,
       ...permission,
       ...role,
+      ...rechargePackage,
+      ...userManage,
+      ...imageRecord,
+      ...pointLog,
+      ...signinConfig,
+      ...signinRecord,
+      ...rechargeOrder,
+      ...banner,
+      ...category,
+      ...product,
     ]
   },
   ...auth,
