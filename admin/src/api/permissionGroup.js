@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-const basicRoute = '/api/permission-group'
+const basicRoute = '/api/v1/permission-group'
 
 export const getPermissionGroupList = (params) => {
   return http.get(basicRoute, {

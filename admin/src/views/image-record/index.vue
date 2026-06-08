@@ -30,8 +30,8 @@
           <el-tag :type="statusTagType(scope.row.status)">{{ statusLabel(scope.row.status) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="task_id" label="任务ID" width="140" show-overflow-tooltip />
-      <el-table-column prop="created_at" label="创建时间" width="170" />
+      <el-table-column prop="task_id" label="任务ID" width="200" show-overflow-tooltip />
+      <el-table-column prop="created_at" label="创建时间" width="200" />
       <el-table-column fixed="right" label="操作" width="150">
         <template #default="scope">
           <el-button type="primary" :link="true" @click="handleView(scope.row)">查看</el-button>
@@ -43,56 +43,52 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination class="pagination-right"
-      @current-change="requestData"
-      v-model:current-page="table.pagination.currentPage"
-      :page-size="table.pagination.pageSize"
-      layout="total, prev, pager, next, jumper"
-      :total="table.pagination.total"
-    />
+    <el-pagination class="pagination-right" @current-change="requestData"
+      v-model:current-page="table.pagination.currentPage" :page-size="table.pagination.pageSize"
+      layout="total, prev, pager, next, jumper" :total="table.pagination.total" />
   </el-card>
 
   <image-detail-dialog ref="detailDialogRef" />
 </template>
 
 <script setup name="imageRecordIndex">
-import { ref, reactive, onMounted } from 'vue'
-import { getImageRecordList, deleteImageRecord } from '@/api/admin'
-import TableAction from '@/components/Table/TableAction.vue'
-import ImageDetailDialog from './components/ImageDetailDialog.vue'
-import notice from '@/utils/notice'
+  import { ref, reactive, onMounted } from 'vue'
+  import { getImageRecordList, deleteImageRecord } from '@/api/admin'
+  import TableAction from '@/components/Table/TableAction.vue'
+  import ImageDetailDialog from './components/ImageDetailDialog.vue'
+  import notice from '@/utils/notice'
 
-const detailDialogRef = ref(null)
-const queryParams = reactive({ type: '', status: '' })
+  const detailDialogRef = ref(null)
+  const queryParams = reactive({ type: '', status: '' })
 
-const typeOptions = ['coloringBook', 'sketchColoring', 'symmetryDrawing', 'hanziCopybook', 'poemIllustration', 'englishFlashcard', 'mathWorksheet', 'pinyinWorksheet', 'mazeGame', 'connectDots', 'findDifference', 'customColoring']
+  const typeOptions = ['coloringBook', 'sketchColoring', 'symmetryDrawing', 'hanziCopybook', 'poemIllustration', 'englishFlashcard', 'mathWorksheet', 'pinyinWorksheet', 'mazeGame', 'connectDots', 'findDifference', 'customColoring']
 
-const table = reactive({
-  data: [],
-  pagination: { currentPage: 1, pageSize: 20, total: 0 },
-  loading: false,
-})
+  const table = reactive({
+    data: [],
+    pagination: { currentPage: 1, pageSize: 20, total: 0 },
+    loading: false,
+  })
 
-const statusTagType = (s) => ({ pending: 'info', generating: 'warning', success: 'success', failed: 'danger' }[s] || 'info')
-const statusLabel = (s) => ({ pending: '待处理', generating: '生成中', success: '成功', failed: '失败' }[s] || s)
+  const statusTagType = (s) => ({ pending: 'info', generating: 'warning', success: 'success', failed: 'danger' }[s] || 'info')
+  const statusLabel = (s) => ({ pending: '待处理', generating: '生成中', success: '成功', failed: '失败' }[s] || s)
 
-const requestData = () => {
-  table.loading = true
-  const params = { page: table.pagination.currentPage, pageSize: table.pagination.pageSize }
-  if (queryParams.type) params.type = queryParams.type
-  if (queryParams.status) params.status = queryParams.status
-  getImageRecordList(params).then(res => {
-    const data = res.data.data
-    table.data = data.list
-    table.pagination.total = data.total
-    table.loading = false
-  }).catch(() => { table.loading = false })
-}
+  const requestData = () => {
+    table.loading = true
+    const params = { page: table.pagination.currentPage, pageSize: table.pagination.pageSize }
+    if (queryParams.type) params.type = queryParams.type
+    if (queryParams.status) params.status = queryParams.status
+    getImageRecordList(params).then(res => {
+      const data = res.data.data
+      table.data = data.list
+      table.pagination.total = data.total
+      table.loading = false
+    }).catch(() => { table.loading = false })
+  }
 
-onMounted(() => requestData())
+  onMounted(() => requestData())
 
-const handleView = (row) => detailDialogRef.value.open(row.id)
-const handleDelete = (row) => {
-  deleteImageRecord(row.id).then(() => { notice.deleteSuccess(); requestData() })
-}
+  const handleView = (row) => detailDialogRef.value.open(row.id)
+  const handleDelete = (row) => {
+    deleteImageRecord(row.id).then(() => { notice.deleteSuccess(); requestData() })
+  }
 </script>

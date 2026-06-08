@@ -39,8 +39,8 @@ export default defineConfig(({ command }) => {
 const mock = (command, prodMock) => {
   return viteMockServe({
     mockPath: 'mock',
-    enable: command === 'serve',
-    prodEnabled: command !== 'serve' && prodMock,
+    enable: true,
+    prodEnabled: true,
     injectCode: `
       import { setupProdMockServer } from './mockProdServer'
       setupProdMockServer()

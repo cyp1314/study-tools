@@ -10,14 +10,16 @@
       <el-table-column prop="title" label="标题" width="150" />
       <el-table-column label="图片" width="160">
         <template #default="scope">
-          <el-image v-if="scope.row.imageUrl" :src="scope.row.imageUrl" fit="cover" style="width:120px;height:60px;border-radius:4px" />
+          <el-image v-if="scope.row.imageUrl" :src="scope.row.imageUrl" fit="cover"
+            style="width:120px;height:60px;border-radius:4px" :preview-teleported="true"
+            :preview-src-list="[scope.row.imageUrl]" />
           <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column prop="link_type" label="跳转类型" width="100">
         <template #default="scope">
-          <el-tag v-if="scope.row.link_type==='page'">小程序页面</el-tag>
-          <el-tag v-else-if="scope.row.link_type==='web'" type="success">网页</el-tag>
+          <el-tag v-if="scope.row.link_type === 'page'">小程序页面</el-tag>
+          <el-tag v-else-if="scope.row.link_type === 'web'" type="success">网页</el-tag>
           <el-tag v-else type="info">无跳转</el-tag>
         </template>
       </el-table-column>
@@ -31,7 +33,8 @@
       <el-table-column fixed="right" label="操作" min-width="200">
         <template #default="scope">
           <el-button type="primary" :link="true" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button :type="scope.row.is_active ? 'warning' : 'success'" :link="true" @click="handleToggle(scope.row)">{{ scope.row.is_active ? '禁用' : '启用' }}</el-button>
+          <el-button :type="scope.row.is_active ? 'warning' : 'success'" :link="true"
+            @click="handleToggle(scope.row)">{{ scope.row.is_active ? '禁用' : '启用' }}</el-button>
           <el-popconfirm title="确定删除？" @confirm="handleDelete(scope.row)">
             <template #reference><el-button type="danger" :link="true">删除</el-button></template>
           </el-popconfirm>
@@ -43,23 +46,23 @@
 </template>
 
 <script setup name="bannerIndex">
-import { ref, onMounted } from 'vue'
-import { getBannerList, deleteBanner, toggleBanner } from '@/api/admin'
-import TableAction from '@/components/Table/TableAction.vue'
-import BannerFormDialog from './components/BannerFormDialog.vue'
-import notice from '@/utils/notice'
+  import { ref, onMounted } from 'vue'
+  import { getBannerList, deleteBanner, toggleBanner } from '@/api/admin'
+  import TableAction from '@/components/Table/TableAction.vue'
+  import BannerFormDialog from './components/BannerFormDialog.vue'
+  import notice from '@/utils/notice'
 
-const formDialogRef = ref(null)
-const tableData = ref([])
-const loading = ref(false)
+  const formDialogRef = ref(null)
+  const tableData = ref([])
+  const loading = ref(false)
 
-const requestData = () => {
-  loading.value = true
-  getBannerList().then(res => { tableData.value = res.data.data; loading.value = false }).catch(() => { loading.value = false })
-}
-onMounted(() => requestData())
+  const requestData = () => {
+    loading.value = true
+    getBannerList().then(res => { tableData.value = res.data.data; loading.value = false }).catch(() => { loading.value = false })
+  }
+  onMounted(() => requestData())
 
-const handleEdit = (row) => formDialogRef.value.open('edit', row)
-const handleToggle = (row) => { toggleBanner(row.id).then(() => { notice.editSuccess(); requestData() }) }
-const handleDelete = (row) => { deleteBanner(row.id).then(() => { notice.deleteSuccess(); requestData() }) }
+  const handleEdit = (row) => formDialogRef.value.open('edit', row)
+  const handleToggle = (row) => { toggleBanner(row.id).then(() => { notice.editSuccess(); requestData() }) }
+  const handleDelete = (row) => { deleteBanner(row.id).then(() => { notice.deleteSuccess(); requestData() }) }
 </script>

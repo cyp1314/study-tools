@@ -3,10 +3,6 @@ import dashboard from '@/views/dashboard/routes'
 import auth from '@/views/auth/routes'
 import ChangePasswordPage from "@/views/auth/changePassword.vue"
 import PageNotFound from "@/components/ErrorPage/PageNotFound.vue"
-import adminUser from '@/views/admin-user/routes'
-import menu from '@/views/menu/routes'
-import role from '@/views/role/routes'
-import permission from '@/views/permission/routes'
 import rechargePackage from '@/views/recharge-package/routes'
 import userManage from '@/views/user-manage/routes'
 import imageRecord from '@/views/image-record/routes'
@@ -39,10 +35,6 @@ export default [
         },
         component: ChangePasswordPage,
       },
-      ...adminUser,
-      ...menu,
-      ...permission,
-      ...role,
       ...rechargePackage,
       ...userManage,
       ...imageRecord,

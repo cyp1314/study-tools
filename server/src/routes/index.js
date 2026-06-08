@@ -13,6 +13,8 @@ router.use('/user', require('./user'));
 router.use('/point', require('./point'));
 router.use('/admin', require('./admin'));
 router.use('/business', require('./business'));
+router.use('/admin-auth', require('./adminAuth'));
+router.use('/menu', require('./menu'));
 // router.use('/material', require('./material'));
 // router.use('/hanzi', require('./hanzi'));
 // router.use('/poem', require('./poem'));

@@ -21,14 +21,10 @@
 import MojitoHeader from "@/components/Layout/Header.vue"
 import NavBar from "@/components/Layout/NavBar.vue"
 import TagsView from "@/components/Layout/TagsView.vue"
-import { usePermissionStore } from '@/store/permission'
 import { useTagStore } from '@/store/tag'
 import { ref, computed } from 'vue'
 
-const permissionStore = usePermissionStore()
 const tagStore = useTagStore()
-
-permissionStore.loadPermissions()
 
 let isCollapse = ref(false)
 
@@ -43,6 +39,5 @@ const changeMenuStatus = (status) => {
 <style lang="scss" scoped>
   .el-main {
     padding:0;
-    //background-color: #f0f2f5;
   }
 </style>

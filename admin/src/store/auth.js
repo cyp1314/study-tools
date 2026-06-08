@@ -11,11 +11,11 @@ export const useAuthStore = defineStore("auth", {
   },
   actions: {
     setToken(token) {
-      this.token = token
+      this.token = { token }
     },
     loginHandle(data) {
       return login(data).then(response => {
-        this.setToken(response.data.data)
+        this.setToken(response.data.data.token)
       })
     },
     logoutHandle() {

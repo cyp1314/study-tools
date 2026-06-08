@@ -1,9 +1,9 @@
 import http from '@/utils/http'
 
-const basicRoute = '/api/menu'
+const basicRoute = '/api/v1/menu/menu'
 
 export const myMenu = () => {
-  return http.get('/api/my-menu')
+  return http.get('/api/v1/menu/my-menu')
 }
 
 export const getMenuList = (params) => {

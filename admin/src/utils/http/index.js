@@ -1,4 +1,4 @@
-import axios  from 'axios'
+import axios from 'axios'
 import { getActivePinia } from 'pinia'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
@@ -6,7 +6,7 @@ import config from '@/config'
 
 const httpRequest = axios.create({
   timeout: 10000,
-  baseURL: import.meta.env.VITE_APP_API_URL
+  baseURL: 'http://localhost:3000'
 })
 
 httpRequest.interceptors.request.use(
@@ -36,7 +36,7 @@ httpRequest.interceptors.response.use(
         if (typeof items === 'string') {
           message += `${items} \n`
         } else {
-          error.response.data.errors[key].forEach( item => {
+          error.response.data.errors[key].forEach(item => {
             message += `${item} \n`
           })
         }
@@ -48,7 +48,7 @@ httpRequest.interceptors.response.use(
         message: "Unauthenticated",
         duration: 1500,
       })
-      router.push({name: config.loginRouteName})
+      router.push({ name: config.loginRouteName })
     }
 
     ElMessage.warning({

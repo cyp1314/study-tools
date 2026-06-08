@@ -27,13 +27,13 @@ export const deleteSignInConfig = (id) => http.delete(`${ADMIN}/signin-config/${
 export const getSignInRecordList = (params) => http.get(`${ADMIN}/signin-record`, { params })
 export const deleteSignInRecord = (id) => http.delete(`${ADMIN}/signin-record/${id}`)
 
-// ==================== 充值订单 ====================
+// ==================== 充值订�?====================
 export const getRechargeOrderList = (params) => http.get(`${ADMIN}/recharge-order`, { params })
 export const getRechargeOrderById = (id) => http.get(`${ADMIN}/recharge-order/${id}`)
 export const markRechargeOrderPaid = (id, data) => http.patch(`${ADMIN}/recharge-order/${id}/pay`, data)
 export const refundRechargeOrder = (id, data) => http.patch(`${ADMIN}/recharge-order/${id}/refund`, data)
 
-// ==================== 充值套餐 ====================
+// ==================== 充值套�?====================
 export const getRechargePackageList = () => http.get(`${ADMIN}/recharge-package`)
 export const getRechargePackage = (id) => http.get(`${ADMIN}/recharge-package/${id}`)
 export const addRechargePackage = (data) => http.post(`${ADMIN}/recharge-package`, data)
@@ -41,7 +41,7 @@ export const editRechargePackage = (id, data) => http.put(`${ADMIN}/recharge-pac
 export const deleteRechargePackage = (id) => http.delete(`${ADMIN}/recharge-package/${id}`)
 export const toggleRechargePackage = (id) => http.patch(`${ADMIN}/recharge-package/${id}/toggle`)
 
-// ==================== 轮播图 ====================
+// ==================== 轮播�?====================
 export const getBannerList = () => http.get(`${ADMIN}/banner`)
 export const getBannerById = (id) => http.get(`${ADMIN}/banner/${id}`)
 export const addBanner = (data) => http.post(`${ADMIN}/banner`, data)

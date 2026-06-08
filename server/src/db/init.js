@@ -14,7 +14,7 @@ async function initDatabase() {
         avatar_url VARCHAR(255) DEFAULT '',
         phone VARCHAR(20) DEFAULT '',
         session_key VARCHAR(128) DEFAULT '',
-        role ENUM('parent','child') DEFAULT 'parent',
+        role ENUM('user','admin') DEFAULT 'user',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -266,6 +266,27 @@ async function initDatabase() {
         (9, 7), (10, 7), (11, 7)
       `);
       console.log('[DB] Default product-category relations inserted');
+    }
+
+    // ==================== 管理员账号表 ====================
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+        password VARCHAR(255) NOT NULL COMMENT '密码(Bcrypt加密)',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 插入默认管理员账号（用户名: admin, 密码: 123456）
+    const [adminRows] = await connection.query('SELECT COUNT(*) as cnt FROM admins');
+    if (adminRows[0].cnt === 0) {
+      // 密码: 123456 使用 bcrypt 加密
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = bcrypt.hashSync('123456', 10);
+      await connection.query(`INSERT INTO admins (username, password) VALUES (?, ?)`, ['admin', hashedPassword]);
+      console.log('[DB] Default admin account inserted');
     }
 
     console.log('Database tables initialized successfully');
