@@ -6,7 +6,8 @@ const router = new Router({ prefix: '/api/v1' });
 // ==================== 基础路由 ====================
 router.get('/health', health);
 
-// ==================== 业务路由（后续按模块添加）====================
+// ==================== 业务路由 ====================
+router.use('/image', require('./image'));
 // router.use('/user', require('./user'));
 // router.use('/material', require('./material'));
 // router.use('/hanzi', require('./hanzi'));

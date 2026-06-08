@@ -42,7 +42,7 @@ let server;
 
 async function start() {
   try {
-    // 初始化数据库（建表）
+    // // 初始化数据库（建表）
     await initDatabase();
     console.log('[DB] Database initialized');
 

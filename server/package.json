@@ -9,13 +9,16 @@
     "init-db": "node src/db/init.js"
   },
   "dependencies": {
-    "koa": "^2.15.0",
     "@koa/router": "^12.0.1",
+    "@volcengine/openapi": "^1.16.0",
+    "axios": "^1.17.0",
+    "dotenv": "^16.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "koa": "^2.15.0",
     "koa-bodyparser": "^4.4.1",
     "koa-cors": "^0.0.16",
     "mysql2": "^3.9.0",
-    "dotenv": "^16.4.0",
-    "jsonwebtoken": "^9.0.2"
+    "qiniu": "^7.15.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
