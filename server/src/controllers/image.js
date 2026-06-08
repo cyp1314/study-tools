@@ -1,6 +1,8 @@
 const jimengService = require('../services/jimeng');
 const imageRecordService = require('../services/imageRecord');
 const qiniuUploader = require('../utils/qiniu');
+const pointService = require('../services/pointService');
+const config = require('../config');
 const { buildPrompt, getPromptConfig, promptConfig } = require('../config/prompts');
 const { success, AppError } = require('../middleware/response');
 
@@ -29,6 +31,8 @@ class ImageController {
    */
   async generate(ctx) {
     const { type, prompt, options = {} } = ctx.request.body;
+    const userId = ctx.state.user?.id;
+    const costPoints = config.points.perGeneration;
 
     if (!type) {
       throw new AppError('type参数必填', -1, 400);
@@ -39,6 +43,15 @@ class ImageController {
       getPromptConfig(type);
     } catch (err) {
       throw new AppError(err.message, -1, 400);
+    }
+
+    // 扣减积分（登录用户）
+    if (userId) {
+      try {
+        await pointService.deduct(userId, costPoints, 'generate', `生成${type}图片`);
+      } catch (err) {
+        throw new AppError(err.message, -1, 400);
+      }
     }
 
     // 构建完整提示词
@@ -95,6 +108,12 @@ class ImageController {
         previewUrls,
       }, '图片生成成功');
     } catch (err) {
+      // 积分退还（登录用户且非积分不足导致的失败）
+      if (userId && !err.message.includes('积分不足')) {
+        try {
+          await pointService.add(userId, costPoints, 'other', `生成失败退还积分`);
+        } catch (_) {}
+      }
       // 更新数据库记录为失败
       if (recordId) {
         await imageRecordService.markFailed(recordId, err.message).catch(() => {});

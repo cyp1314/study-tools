@@ -25,6 +25,14 @@ const config = {
     domain: process.env.QINIU_DOMAIN || '',
     region: process.env.QINIU_REGION || 'Zone_z2',
   },
+  wx: {
+    appId: process.env.WX_MINI_APPID || '',
+    appSecret: process.env.WX_MINI_SECRET || '',
+  },
+  points: {
+    perGeneration: parseInt(process.env.POINTS_PER_GENERATION, 10) || 10,
+    newUserBonus: parseInt(process.env.NEW_USER_BONUS, 10) || 50,
+  },
   jwt: {
     secret: process.env.JWT_SECRET || 'default_secret',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',

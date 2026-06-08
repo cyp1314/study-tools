@@ -8,7 +8,9 @@ router.get('/health', health);
 
 // ==================== 业务路由 ====================
 router.use('/image', require('./image'));
-// router.use('/user', require('./user'));
+router.use('/auth', require('./auth'));
+router.use('/user', require('./user'));
+router.use('/point', require('./point'));
 // router.use('/material', require('./material'));
 // router.use('/hanzi', require('./hanzi'));
 // router.use('/poem', require('./poem'));
