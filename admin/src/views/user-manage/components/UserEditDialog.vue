@@ -7,6 +7,12 @@
       <el-form-item label="手机号">
         <el-input v-model="form.phone" />
       </el-form-item>
+      <el-form-item label="角色">
+        <el-radio-group v-model="form.role">
+          <el-radio label="parent">家长</el-radio>
+          <el-radio label="child">儿童</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
@@ -25,11 +31,11 @@
   const formRef = ref(null)
   let currentId = null
 
-  const form = ref({ nickname: '', phone: '' })
+  const form = ref({ nickname: '', phone: '', role: '' })
 
   const open = (row) => {
     currentId = row.id
-    form.value = { nickname: row.nickname || '', phone: row.phone || '' }
+    form.value = { nickname: row.nickname || '', phone: row.phone || '', role: row.role || '' }
     visible.value = true
   }
 

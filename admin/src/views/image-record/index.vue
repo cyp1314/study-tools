@@ -23,14 +23,28 @@
     <table-action title="图片记录" />
     <el-table :data="table.data" v-loading="table.loading" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="type" label="类型" width="130" />
-      <el-table-column prop="user_input" label="用户输入" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="status" label="状态" width="90">
+      <el-table-column prop="task_id" label="任务ID" show-overflow-tooltip />
+      <el-table-column prop="type" label="类型" />
+      <el-table-column prop="status" label="状态">
         <template #default="scope">
           <el-tag :type="statusTagType(scope.row.status)">{{ statusLabel(scope.row.status) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="task_id" label="任务ID" width="200" show-overflow-tooltip />
+      <el-table-column prop="user_input" label="用户输入" show-overflow-tooltip />
+      <el-table-column prop="full_prompt" label="完整提示词" width="600">
+        <template #default="scope">
+          <TextPopover :text="scope.row.full_prompt" max-width="600px" />
+        </template>
+      </el-table-column>
+      <!-- <el-table-column prop="images" label="预览" width="120" align="center">
+        <template #default="scope">
+          <el-image v-if="scope.row.images && scope.row.images.length > 0"
+            :src="`data:image/png;base64,${scope.row.images[0]}`"
+            :preview-src-list="scope.row.images.map(b64 => `data:image/png;base64,${b64}`)" fit="contain"
+            style="width: 100px; height: 100px;" />
+          <span v-else>-</span>
+        </template>
+      </el-table-column> -->
       <el-table-column prop="created_at" label="创建时间" width="200" />
       <el-table-column fixed="right" label="操作" width="150">
         <template #default="scope">
@@ -56,6 +70,7 @@
   import { getImageRecordList, deleteImageRecord } from '@/api/admin'
   import TableAction from '@/components/Table/TableAction.vue'
   import ImageDetailDialog from './components/ImageDetailDialog.vue'
+  import TextPopover from '@/components/Text/TextPopover.vue'
   import notice from '@/utils/notice'
 
   const detailDialogRef = ref(null)

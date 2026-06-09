@@ -8,7 +8,7 @@ class AdminBannerController {
     // 生成预览URL
     const result = list.map(b => ({
       ...b,
-      imageUrl: b.image_key ? qiniuUploader.getPrivateDownloadUrl(b.image_key) : '',
+      imageUrl: b.image_key ? qiniuUploader.getPublicUrl(b.image_key) : '',
     }));
     success(ctx, result);
   }
@@ -17,7 +17,7 @@ class AdminBannerController {
     const { id } = ctx.params;
     const banner = await bannerService.findById(id);
     if (!banner) throw new AppError('轮播图不存在', -1, 404);
-    success(ctx, { ...banner, imageUrl: banner.image_key ? qiniuUploader.getPrivateDownloadUrl(banner.image_key) : '' });
+    success(ctx, { ...banner, imageUrl: banner.image_key ? qiniuUploader.getPublicUrl(banner.image_key) : '' });
   }
 
   async create(ctx) {

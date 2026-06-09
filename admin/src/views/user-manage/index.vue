@@ -12,23 +12,35 @@
   <el-card style="margin:10px;">
     <table-action title="用户管理" />
     <el-table :data="table.data" v-loading="table.loading" border style="width: 100%">
-      <el-table-column prop="id" label="ID" width="70" />
+      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="nickname" label="昵称">
         <template #default="scope">
           {{ scope.row.nickname || '-' }}
         </template>
       </el-table-column>
-      <el-table-column prop="phone" label="手机号" width="130">
+      <el-table-column prop="openid" label="OpenID" />
+      <el-table-column prop="avatar" label="头像" width="100">
+        <template #default="scope">
+          <ImagePreview :src="scope.row.avatar || ''" width="60" height="60" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" label="手机号" width="140">
         <template #default="scope">
           {{ scope.row.phone || '-' }}
         </template>
       </el-table-column>
-      <el-table-column prop="role" label="角色" width="80" />
+      <el-table-column prop="role" label="角色" width="100">
+        <template #default="scope">
+          <el-tag :type="scope.row.role === 'parent' ? 'primary' : 'success'">
+            {{ scope.row.role === 'parent' ? '家长' : '儿童' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="balance" label="积分余额" width="100" />
       <el-table-column prop="total_earned" label="累计获得" width="100" />
       <el-table-column prop="total_spent" label="累计消耗" width="100" />
-      <el-table-column prop="created_at" label="注册时间" width="170" />
-      <el-table-column fixed="right" label="操作">
+      <el-table-column prop="created_at" label="注册时间" />
+      <el-table-column fixed="right" label="操作" width="200">
         <template #default="scope">
           <el-button type="primary" :link="true" @click="handleAdjust(scope.row)">调整积分</el-button>
           <el-button type="primary" :link="true" @click="handleEdit(scope.row)">编辑</el-button>

@@ -33,7 +33,7 @@ class AdminImageRecordController {
     let previewUrls = [];
     try {
       const keys = typeof record.image_keys === 'string' ? JSON.parse(record.image_keys) : (record.image_keys || []);
-      if (keys.length > 0) previewUrls = qiniuUploader.getPrivateDownloadUrls(keys);
+      if (keys.length > 0) previewUrls = qiniuUploader.getPublicUrls(keys);
     } catch (_) {}
     success(ctx, { ...record, previewUrls });
   }

@@ -111,14 +111,14 @@ class ImageController {
       if (recordId) {
         await imageRecordService.markSuccess(recordId, {
           images: result.images || [],
-          imageKeys,
+          imageKeys: qiniuUploader.getPublicUrls(imageKeys || []),
           taskId: result.taskId || '',
         });
       }
 
       // 生成七牛云预览URL
       const previewUrls = imageKeys.filter(Boolean).length > 0
-        ? qiniuUploader.getPrivateDownloadUrls(imageKeys.filter(Boolean))
+        ? qiniuUploader.getPublicUrls(imageKeys.filter(Boolean))
         : [];
 
       // 只返回 recordId 和预览URL
@@ -131,11 +131,11 @@ class ImageController {
       if (userId && !err.message.includes('积分不足')) {
         try {
           await pointService.add(userId, costPoints, 'other', `生成失败退还积分`);
-        } catch (_) {}
+        } catch (_) { }
       }
       // 更新数据库记录为失败
       if (recordId) {
-        await imageRecordService.markFailed(recordId, err.message).catch(() => {});
+        await imageRecordService.markFailed(recordId, err.message).catch(() => { });
       }
       throw err;
     }
@@ -182,9 +182,9 @@ class ImageController {
     let taskId;
     try {
       taskId = await jimengService.submitTask({
-          prompt: fullPrompt,
-          extra: { return_url: true, logo_info: { add_logo: false }, ...options },
-        });
+        prompt: fullPrompt,
+        extra: { return_url: true, logo_info: { add_logo: false }, ...options },
+      });
 
       // 更新记录的taskId和状态
       if (recordId) {
@@ -195,7 +195,7 @@ class ImageController {
       }
     } catch (err) {
       if (recordId) {
-        await imageRecordService.markFailed(recordId, err.message).catch(() => {});
+        await imageRecordService.markFailed(recordId, err.message).catch(() => { });
       }
       throw err;
     }
@@ -278,7 +278,7 @@ class ImageController {
     try {
       const keys = typeof record.image_keys === 'string' ? JSON.parse(record.image_keys) : (record.image_keys || []);
       if (keys.length > 0) {
-        previewUrls = qiniuUploader.getPrivateDownloadUrls(keys);
+        previewUrls = qiniuUploader.getPublicUrls(keys);
       }
     } catch (e) {
       // ignore
@@ -306,7 +306,7 @@ class ImageController {
         if (rows.length > 0) {
           await imageRecordService.markSuccess(rows[0].id, {
             images: result.images || [],
-            imageKeys,
+            imageKeys: qiniuUploader.getPublicUrls(imageKeys || []),
             taskId: result.taskId || '',
           });
         }

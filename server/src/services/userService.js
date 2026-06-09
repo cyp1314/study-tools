@@ -23,6 +23,7 @@ class UserService extends BaseService {
     const updates = {};
     if (nickname !== undefined) updates.nickname = nickname;
     if (avatarUrl !== undefined) updates.avatar_url = avatarUrl;
+    if (role !== undefined) updates.role = role;
 
     if (Object.keys(updates).length === 0) return;
 

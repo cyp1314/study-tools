@@ -24,8 +24,8 @@ class UserController {
    */
   async updateProfile(ctx) {
     const userId = ctx.state.user.id;
-    const { nickname, avatarUrl } = ctx.request.body;
-    await userService.updateProfile(userId, { nickname, avatarUrl });
+    const { nickname, avatarUrl, role } = ctx.request.body;
+    await userService.updateProfile(userId, { nickname, avatarUrl, role });
     success(ctx, null, '更新成功');
   }
 

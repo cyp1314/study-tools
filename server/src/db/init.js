@@ -191,7 +191,7 @@ async function initDatabase() {
         suffix TEXT COMMENT '提示词后缀',
         default_prompt VARCHAR(255) DEFAULT '' COMMENT '默认提示词',
         description VARCHAR(255) DEFAULT '' COMMENT '产品描述',
-        cover_image VARCHAR(255) DEFAULT '' COMMENT '封面图key',
+        cover_image VARCHAR(255) DEFAULT '' COMMENT '产品图标',
         sort_order INT NOT NULL DEFAULT 0 COMMENT '排序',
         is_active TINYINT NOT NULL DEFAULT 1 COMMENT '是否启用',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

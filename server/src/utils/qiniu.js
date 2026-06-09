@@ -62,6 +62,30 @@ class QiniuUploader {
   }
 
   /**
+   * 生成公开访问链接（适用于公开存储桶）
+   * @param {string} key - 文件key（上传时的key，如 common/icon/20260608/abc123.png）
+   * @returns {string} 公开访问URL
+   */
+  getPublicUrl(key) {
+    this._checkReady();
+    if (!key) return '';
+    // 确保 domain 不以 / 结尾，key 不以 / 开头
+    const normalizedDomain = this.domain.replace(/\/$/, '');
+    const normalizedKey = key.startsWith('/') ? key.slice(1) : key;
+    return `${normalizedDomain}/${normalizedKey}`;
+  }
+
+  /**
+   * 批量生成公开访问链接
+   * @param {string[]} keys - 文件key数组
+   * @returns {string[]} 公开访问URL数组
+   */
+  getPublicUrls(keys) {
+    if (!keys || keys.length === 0) return [];
+    return keys.map((key) => this.getPublicUrl(key));
+  }
+
+  /**
    * 生成私有下载/预览链接
    * @param {string} key - 文件key（上传时的key，如 jimeng/20260608/abc123.png）
    * @param {number} expires - 链接有效期（秒），默认1小时

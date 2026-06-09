@@ -13,7 +13,7 @@ class AdminProductController {
       result.push({
         ...p,
         categoryIds,
-        coverUrl: p.cover_image ? qiniuUploader.getPrivateDownloadUrl(p.cover_image) : '',
+        coverUrl: p.cover_image ? qiniuUploader.getPublicUrl(p.cover_image) : '',
       });
     }
     success(ctx, result);
@@ -27,7 +27,7 @@ class AdminProductController {
     success(ctx, {
       ...product,
       categoryIds,
-      coverUrl: product.cover_image ? qiniuUploader.getPrivateDownloadUrl(product.cover_image) : '',
+      coverUrl: product.cover_image ? qiniuUploader.getPublicUrl(product.cover_image) : '',
     });
   }
 

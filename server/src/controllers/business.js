@@ -17,7 +17,7 @@ class BusinessController {
     const result = list.map(b => ({
       id: b.id,
       title: b.title,
-      imageUrl: b.image_key ? qiniuUploader.getPrivateDownloadUrl(b.image_key) : '',
+      imageUrl: b.image_key ? qiniuUploader.getPublicUrl(b.image_key) : '',
       linkType: b.link_type,
       linkUrl: b.link_url,
     }));
@@ -57,7 +57,7 @@ class BusinessController {
       type: p.type,
       defaultPrompt: p.default_prompt,
       description: p.description,
-      coverUrl: p.cover_image ? qiniuUploader.getPrivateDownloadUrl(p.cover_image) : '',
+      coverUrl: p.cover_image ? qiniuUploader.getPublicUrl(p.cover_image) : '',
     }));
     success(ctx, result);
   }
@@ -79,7 +79,7 @@ class BusinessController {
       type: product.type,
       defaultPrompt: product.default_prompt,
       description: product.description,
-      coverUrl: product.cover_image ? qiniuUploader.getPrivateDownloadUrl(product.cover_image) : '',
+      coverUrl: product.cover_image ? qiniuUploader.getPublicUrl(product.cover_image) : '',
       categoryIds,
     });
   }

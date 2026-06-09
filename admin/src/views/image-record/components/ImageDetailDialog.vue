@@ -19,10 +19,10 @@
         <el-descriptions-item label="创建时间">{{ detail.created_at }}</el-descriptions-item>
       </el-descriptions>
 
-      <div v-if="previewUrls.length > 0" style="margin-top:16px;">
+      <div v-if="imageUrls.length > 0" style="margin-top:16px;">
         <h4>生成图片</h4>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
-          <el-image v-for="(url, idx) in previewUrls" :key="idx" :src="url" :preview-src-list="previewUrls"
+          <el-image v-for="(url, idx) in imageUrls" :key="idx" :src="url" :preview-src-list="imageUrls"
             :initial-index="idx" fit="contain"
             style="width:200px;height:200px;border:1px solid #eee;border-radius:4px;" />
         </div>
@@ -39,7 +39,7 @@
   const visible = ref(false)
   const loading = ref(false)
   const detail = ref({})
-  const previewUrls = ref([])
+  const imageUrls = ref([])
 
   const statusTagType = (s) => ({ pending: 'info', generating: 'warning', success: 'success', failed: 'danger' }[s] || 'info')
 
@@ -47,10 +47,12 @@
     visible.value = true
     loading.value = true
     detail.value = {}
-    previewUrls.value = []
+    imageUrls.value = []
     getImageRecordById(id).then(res => {
       detail.value = res.data.data
-      previewUrls.value = res.data.data.previewUrls || []
+      // 将 base64 数组转换为图片 URL
+      const images = res.data.data.images || []
+      imageUrls.value = images.map(base64 => `data:image/png;base64,${base64}`)
       loading.value = false
     }).catch(() => { loading.value = false })
   }
