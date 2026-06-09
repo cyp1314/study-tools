@@ -94,6 +94,7 @@
     if (queryParams.status) params.status = queryParams.status
     getImageRecordList(params).then(res => {
       const data = res.data.data
+      console.log('[API] getImageRecordList:', data)
       table.data = data.list
       table.pagination.total = data.total
       table.loading = false

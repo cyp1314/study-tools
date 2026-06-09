@@ -5,7 +5,13 @@
         <el-input v-model="form.name" />
       </el-form-item>
       <el-form-item label="图标">
-        <el-input v-model="form.icon" placeholder="Element Plus图标名" />
+        <ImageUpload 
+          v-model="form.imageUrl" 
+          :width="'80px'" 
+          :height="'80px'"
+          placeholder="点击上传图标"
+          @change="handleImageChange"
+        />
       </el-form-item>
       <el-form-item label="排序">
         <el-input-number v-model="form.sortOrder" :min="0" :max="999" />
@@ -25,6 +31,7 @@
 import { addCategory, editCategory } from '@/api/admin'
 import notice from '@/utils/notice'
 import { ref, nextTick } from 'vue'
+import ImageUpload from '@/components/Image/ImageUpload.vue'
 
 const emit = defineEmits(['success'])
 const visible = ref(false)
@@ -32,17 +39,23 @@ const actionType = ref('add')
 let currentId = null
 const formRef = ref(null)
 
-const form = ref({ name: '', icon: '', sortOrder: 0, isActive: true })
+const form = ref({ name: '', icon: '', imageUrl: '', sortOrder: 0, isActive: true })
 const rules = { name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }] }
 
 const open = (action = 'add', row = null) => {
   actionType.value = action
   if (action === 'add') {
-    form.value = { name: '', icon: '', sortOrder: 0, isActive: true }
+    form.value = { name: '', icon: '', imageUrl: '', sortOrder: 0, isActive: true }
     nextTick(() => formRef.value?.clearValidate())
   } else {
     currentId = row.id
-    form.value = { name: row.name, icon: row.icon || '', sortOrder: row.sort_order, isActive: !!row.is_active }
+    form.value = { 
+      name: row.name, 
+      icon: row.icon || '', 
+      imageUrl: row.icon || '',
+      sortOrder: row.sort_order, 
+      isActive: !!row.is_active 
+    }
   }
   visible.value = true
 }
@@ -50,12 +63,23 @@ const open = (action = 'add', row = null) => {
 const handleSubmit = () => {
   formRef.value.validate((valid) => {
     if (!valid) return
+    const submitData = {
+      name: form.value.name,
+      icon: form.value.icon,
+      sortOrder: form.value.sortOrder,
+      isActive: form.value.isActive,
+    }
     if (actionType.value === 'add') {
-      addCategory(form.value).then(() => { notice.addSuccess(); visible.value = false; emit('success') })
+      addCategory(submitData).then(() => { notice.addSuccess(); visible.value = false; emit('success') })
     } else {
-      editCategory(currentId, form.value).then(() => { notice.editSuccess(); visible.value = false; emit('success') })
+      editCategory(currentId, submitData).then(() => { notice.editSuccess(); visible.value = false; emit('success') })
     }
   })
+}
+
+const handleImageChange = ({ key, url }) => {
+  form.value.icon = key
+  form.value.imageUrl = url
 }
 
 defineExpose({ open })

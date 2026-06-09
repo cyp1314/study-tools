@@ -1,17 +1,27 @@
 const categoryService = require('../services/categoryService');
+const qiniuUploader = require('../utils/qiniu');
 const { success, AppError } = require('../middleware/response');
 
 class AdminCategoryController {
   async list(ctx) {
     const list = await categoryService.getAllList();
-    success(ctx, list);
+    // 生成图标预览URL
+    const result = list.map(cat => ({
+      ...cat,
+      icon: cat.icon ? qiniuUploader.getPublicUrl(cat.icon) : '',
+    }));
+    success(ctx, result);
   }
 
   async getById(ctx) {
     const { id } = ctx.params;
     const cat = await categoryService.findById(id);
     if (!cat) throw new AppError('分类不存在', -1, 404);
-    success(ctx, cat);
+    // 生成图标预览URL
+    success(ctx, { 
+      ...cat, 
+      icon: cat.icon ? qiniuUploader.getPublicUrl(cat.icon) : '',
+    });
   }
 
   async create(ctx) {

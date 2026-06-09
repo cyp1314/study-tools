@@ -3,11 +3,14 @@ require('dotenv').config();
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa-cors');
+const { koaSwagger } = require('koa2-swagger-ui');
 const config = require('./config');
 const router = require('./routes/index');
 const errorMiddleware = require('./middleware/error');
 const loggerMiddleware = require('./middleware/logger');
+const apiLoggerMiddleware = require('./middleware/apiLogger');
 const initDatabase = require('./db/init');
+const swaggerSpec = require('./config/swagger');
 
 const app = new Koa();
 
@@ -20,13 +23,16 @@ app.on('error', (err, ctx) => {
 // 1. 全局错误处理 - 最外层，捕获所有下游错误
 app.use(errorMiddleware);
 
-// 2. 请求日志
+// 2. 请求日志（控制台）
 app.use(loggerMiddleware);
 
-// 3. 跨域
+// 3. API 调用日志（数据库）
+app.use(apiLoggerMiddleware);
+
+// 4. 跨域
 app.use(cors());
 
-// 4. 请求体解析
+// 5. 请求体解析
 app.use(bodyParser({
   enableTypes: ['json', 'form'],
   jsonLimit: '10mb',
@@ -36,6 +42,19 @@ app.use(bodyParser({
 // 5. 路由
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+// 6. Swagger 文档（仅开发环境）
+if (process.env.NODE_ENV !== 'production') {
+  app.use(
+    koaSwagger({
+      routePrefix: '/api-docs',
+      swaggerOptions: {
+        spec: swaggerSpec,
+        url: '/api-docs/swagger.json',
+      },
+    })
+  );
+}
 
 // ==================== 启动服务 ====================
 let server;
@@ -49,6 +68,7 @@ async function start() {
     server = app.listen(config.port, () => {
       console.log(`[Server] Running on http://localhost:${config.port}`);
       console.log(`[Server] Health check: http://localhost:${config.port}/api/v1/health`);
+      console.log(`[Server] API Docs: http://localhost:${config.port}/api-docs`);
     });
   } catch (err) {
     console.error('[Server] Failed to start:', err.message);

@@ -40,7 +40,7 @@ class BaseService {
   }
 
   async findById(id) {
-    const [rows] = await this.queryWithRetry(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
+    const rows = await this.queryWithRetry(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
     return rows[0] || null;
   }
 
@@ -64,7 +64,7 @@ class BaseService {
     sql += ' ORDER BY id DESC LIMIT ? OFFSET ?';
     values.push(pageSize, offset);
 
-    const [rows] = await this.queryWithRetry(sql, values);
+    const rows = await this.queryWithRetry(sql, values);
     return rows;
   }
 
@@ -83,16 +83,17 @@ class BaseService {
     if (whereClauses.length > 0) {
       sql += ' WHERE ' + whereClauses.join(' AND ');
     }
-
-    const [rows] = await this.queryWithRetry(sql, values);
-    return rows[0].total;
+    console.log('[DB] Query:', sql, values);
+    const rows = await this.queryWithRetry(sql, values);
+    console.log('[DB] Result:', rows);
+    return rows[0]?.total || 0;
   }
 
   async create(data) {
     const keys = Object.keys(data);
     const values = Object.values(data);
     const placeholders = keys.map(() => '?').join(', ');
-    const [result] = await this.queryWithRetry(
+    const result = await this.queryWithRetry(
       `INSERT INTO ${this.tableName} (${keys.join(', ')}) VALUES (${placeholders})`,
       values
     );

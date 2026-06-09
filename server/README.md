@@ -6,18 +6,106 @@
 
 - **基础路径**: `http://localhost:3000/api/v1`
 - **认证方式**: JWT Token（登录接口返回，放在请求头 `Authorization: Bearer <token>`）
+- **Swagger 文档**: `http://localhost:3000/api-docs`（仅开发环境）
+
+### 快速开始
+
+```bash
+# 安装依赖
+pnpm install
+
+# 初始化数据库
+pnpm run init-db
+
+# 开发模式（含热重载）
+pnpm run dev
+
+# 生产模式
+pnpm start
+```
+
+启动后访问:
+- 服务地址: http://localhost:3000
+- 健康检查: http://localhost:3000/api/v1/health
+- **API 文档**: http://localhost:3000/api-docs
+- **API 日志**: 管理后台接口 `/api/v1/admin/api-log`
+
+---
+
+## API 调用日志
+
+系统已自动记录所有 API 调用日志，包括：
+
+### 📊 记录内容
+- ✅ 请求入参（query params + request body）
+- ✅ 返回参数（response body）
+- ✅ 响应时长（毫秒）
+- ✅ 用户信息（如果已登录）
+- ✅ 客户端信息（IP、User-Agent）
+
+### 🔧 管理接口
+- **查询日志**: `GET /api/v1/admin/api-log`
+- **日志详情**: `GET /api/v1/admin/api-log/:id`
+- **统计数据**: `GET /api/v1/admin/api-log/stats`
+- **清理日志**: `DELETE /api/v1/admin/api-log/cleanup?days=30`
+
+### 📖 详细文档
+查看 [API_LOG_GUIDE.md](./API_LOG_GUIDE.md) 了解完整使用说明。
+
+---
+
+## Swagger API 文档
+
+本项目已集成 Swagger UI，提供交互式 API 文档。
+
+### 访问方式
+
+启动服务后，在浏览器中访问：
+
+```
+http://localhost:3000/api-docs
+```
+
+### 功能特性
+
+- ✅ 可视化查看所有 API 接口
+- ✅ 在线测试 API 接口（支持 JWT 认证）
+- ✅ 查看请求/响应格式
+- ✅ 查看参数说明和示例
+- ✅ 自动生成文档
+
+### 使用说明
+
+1. **查看接口**: 按模块分类展示所有接口
+2. **测试接口**: 
+   - 点击接口展开详情
+   - 点击 "Try it out"
+   - 填写参数
+   - 点击 "Execute" 执行
+3. **认证测试**: 
+   - 点击右上角 "Authorize" 按钮
+   - 输入 `Bearer <your-token>` 
+   - 点击 "Authorize"
+   - 之后所有接口自动携带认证信息
+
+### 注意事项
+
+- Swagger 文档仅在开发环境（`NODE_ENV !== 'production'`）启用
+- 生产环境不会暴露 API 文档
+- 文档基于代码注释自动生成，保持与代码同步
 
 ---
 
 ## 目录
 
-1. [基础路由](#1-基础路由)
-2. [认证模块](#2-认证模块)
-3. [用户模块](#3-用户模块)
-4. [图片生成模块](#4-图片生成模块)
-5. [积分/签到/充值模块](#5-积分签到充值模块)
-6. [业务公开接口](#6-业务公开接口)
-7. [管理后台接口](#7-管理后台接口)
+1. [Swagger API 文档](#swagger-api-文档)
+2. [基础路由](#1-基础路由)
+3. [认证模块](#2-认证模块)
+4. [用户模块](#3-用户模块)
+5. [图片生成模块](#4-图片生成模块)
+6. [积分/签到/充值模块](#5-积分签到充值模块)
+7. [业务公开接口](#6-业务公开接口)
+8. [管理后台接口](#7-管理后台接口)
 
 ---
 

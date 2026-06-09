@@ -3,7 +3,16 @@ const { health } = require('../controllers/index');
 
 const router = new Router({ prefix: '/api/v1' });
 
-// ==================== 基础路由 ====================
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: 健康检查
+ *     tags: [基础]
+ *     responses:
+ *       200:
+ *         description: 服务正常
+ */
 router.get('/health', health);
 
 // ==================== 业务路由 ====================

@@ -1,283 +1,10 @@
-const Router = require('@koa/router');
-const rechargePackageController = require('../controllers/rechargePackage');
-const adminUserController = require('../controllers/adminUser');
-const adminImageRecordController = require('../controllers/adminImageRecord');
-const adminPointLogController = require('../controllers/adminPointLog');
-const adminSignInConfigController = require('../controllers/adminSignInConfig');
-const adminSignInRecordController = require('../controllers/adminSignInRecord');
-const adminRechargeOrderController = require('../controllers/adminRechargeOrder');
-const adminBannerController = require('../controllers/adminBanner');
-const adminCategoryController = require('../controllers/adminCategory');
-const adminProductController = require('../controllers/adminProduct');
-const adminApiLogController = require('../controllers/adminApiLog');
-
-const router = new Router();
-
 /**
- * @swagger
- * tags:
- *   - name: 管理后台-充值套餐
- *     description: 充值套餐管理
- *   - name: 管理后台-用户
- *     description: 用户管理
- *   - name: 管理后台-图片记录
- *     description: 图片记录管理
- *   - name: 管理后台-积分记录
- *     description: 积分记录管理
- *   - name: 管理后台-签到配置
- *     description: 签到配置管理
- *   - name: 管理后台-签到记录
- *     description: 签到记录管理
- *   - name: 管理后台-充值订单
- *     description: 充值订单管理
- *   - name: 管理后台-轮播图
- *     description: 轮播图管理
- *   - name: 管理后台-分类
- *     description: 分类管理
- *   - name: 管理后台-产品
- *     description: 产品管理
- *   - name: 管理后台-API日志
- *     description: API日志管理
- *
- * /admin/recharge-package:
- *   get:
- *     summary: 获取充值套餐列表
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: 获取成功
- *   post:
- *     summary: 创建充值套餐
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, price, points]
- *             properties:
- *               name:
- *                 type: string
- *               price:
- *                 type: number
- *               points:
- *                 type: integer
- *               description:
- *                 type: string
- *     responses:
- *       200:
- *         description: 创建成功
- *
- * /admin/recharge-package/{id}:
- *   get:
- *     summary: 获取充值套餐详情
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: 获取成功
- *   put:
- *     summary: 更新充值套餐
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               price:
- *                 type: number
- *               points:
- *                 type: integer
- *               description:
- *                 type: string
- *     responses:
- *       200:
- *         description: 更新成功
- *   delete:
- *     summary: 删除充值套餐
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: 删除成功
- *
- * /admin/recharge-package/{id}/toggle:
- *   patch:
- *     summary: 切换充值套餐状态
- *     tags: [管理后台-充值套餐]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: 切换成功
+ * 管理后台接口 Swagger 文档补充
+ * 
+ * 使用说明：
+ * 1. 将此文件中的注释添加到对应的路由文件中
+ * 2. 或者直接在 Swagger UI 中查看文档
  */
-
-// ==================== 充值套餐 ====================
-router.get('/recharge-package', rechargePackageController.list);
-router.get('/recharge-package/:id', rechargePackageController.getById);
-router.post('/recharge-package', rechargePackageController.create);
-router.put('/recharge-package/:id', rechargePackageController.update);
-router.delete('/recharge-package/:id', rechargePackageController.remove);
-router.patch('/recharge-package/:id/toggle', rechargePackageController.toggleActive);
-
-// ==================== 用户管理 ====================
-/**
- * @swagger
- * /admin/user:
- *   get:
- *     summary: 获取用户列表
- *     tags: [管理后台-用户]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: page
- *         in: query
- *         schema:
- *           type: integer
- *           default: 1
- *       - name: pageSize
- *         in: query
- *         schema:
- *           type: integer
- *           default: 20
- *       - name: keyword
- *         in: query
- *         schema:
- *           type: string
- *         description: 搜索关键词（昵称/手机号）
- *     responses:
- *       200:
- *         description: 获取成功
- *
- * /admin/user/{id}:
- *   get:
- *     summary: 获取用户详情
- *     tags: [管理后台-用户]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: 获取成功
- *   put:
- *     summary: 更新用户信息
- *     tags: [管理后台-用户]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nickname:
- *                 type: string
- *               avatarUrl:
- *                 type: string
- *               points:
- *                 type: integer
- *     responses:
- *       200:
- *         description: 更新成功
- *   delete:
- *     summary: 删除用户
- *     tags: [管理后台-用户]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: 删除成功
- *
- * /admin/user/{id}/adjust-points:
- *   post:
- *     summary: 调整用户积分
- *     tags: [管理后台-用户]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [points, reason]
- *             properties:
- *               points:
- *                 type: integer
- *                 description: 调整的积分数（正数增加，负数减少）
- *               reason:
- *                 type: string
- *                 description: 调整原因
- *     responses:
- *       200:
- *         description: 调整成功
- */
-router.get('/user', adminUserController.list);
-router.get('/user/:id', adminUserController.getById);
-router.put('/user/:id', adminUserController.update);
-router.post('/user/:id/adjust-points', adminUserController.adjustPoints);
-router.delete('/user/:id', adminUserController.remove);
 
 // ==================== 图片记录 ====================
 /**
@@ -303,6 +30,7 @@ router.delete('/user/:id', adminUserController.remove);
  *         in: query
  *         schema:
  *           type: integer
+ *         description: 用户ID筛选
  *     responses:
  *       200:
  *         description: 获取成功
@@ -362,6 +90,12 @@ router.delete('/user/:id', adminUserController.remove);
  *         in: query
  *         schema:
  *           type: integer
+ *         description: 用户ID筛选
+ *       - name: type
+ *         in: query
+ *         schema:
+ *           type: string
+ *         description: 变动类型筛选
  *     responses:
  *       200:
  *         description: 获取成功
@@ -394,8 +128,12 @@ router.delete('/user/:id', adminUserController.remove);
  *             properties:
  *               day:
  *                 type: integer
+ *                 description: 连续签到天数
  *               points:
  *                 type: integer
+ *                 description: 奖励积分
+ *               description:
+ *                 type: string
  *     responses:
  *       200:
  *         description: 创建成功
@@ -423,6 +161,8 @@ router.delete('/user/:id', adminUserController.remove);
  *                 type: integer
  *               points:
  *                 type: integer
+ *               description:
+ *                 type: string
  *     responses:
  *       200:
  *         description: 更新成功
@@ -462,6 +202,10 @@ router.delete('/user/:id', adminUserController.remove);
  *         schema:
  *           type: integer
  *           default: 20
+ *       - name: userId
+ *         in: query
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: 获取成功
@@ -482,22 +226,6 @@ router.delete('/user/:id', adminUserController.remove);
  *       200:
  *         description: 删除成功
  */
-router.get('/image-record', adminImageRecordController.list);
-router.get('/image-record/:id', adminImageRecordController.getById);
-router.delete('/image-record/:id', adminImageRecordController.remove);
-
-// ==================== 积分记录 ====================
-router.get('/point-log', adminPointLogController.list);
-
-// ==================== 签到配置 ====================
-router.get('/signin-config', adminSignInConfigController.list);
-router.post('/signin-config', adminSignInConfigController.create);
-router.put('/signin-config/:id', adminSignInConfigController.update);
-router.delete('/signin-config/:id', adminSignInConfigController.remove);
-
-// ==================== 签到记录 ====================
-router.get('/signin-record', adminSignInRecordController.list);
-router.delete('/signin-record/:id', adminSignInRecordController.remove);
 
 // ==================== 充值订单 ====================
 /**
@@ -519,10 +247,15 @@ router.delete('/signin-record/:id', adminSignInRecordController.remove);
  *         schema:
  *           type: integer
  *           default: 20
+ *       - name: userId
+ *         in: query
+ *         schema:
+ *           type: integer
  *       - name: status
  *         in: query
  *         schema:
  *           type: string
+ *         description: 订单状态筛选
  *     responses:
  *       200:
  *         description: 获取成功
@@ -607,6 +340,8 @@ router.delete('/signin-record/:id', adminSignInRecordController.remove);
  *                 type: string
  *               linkType:
  *                 type: string
+ *               linkUrl:
+ *                 type: string
  *               sortOrder:
  *                 type: integer
  *     responses:
@@ -652,6 +387,8 @@ router.delete('/signin-record/:id', adminSignInRecordController.remove);
  *                 type: string
  *               linkType:
  *                 type: string
+ *               linkUrl:
+ *                 type: string
  *               sortOrder:
  *                 type: integer
  *     responses:
@@ -688,18 +425,6 @@ router.delete('/signin-record/:id', adminSignInRecordController.remove);
  *       200:
  *         description: 切换成功
  */
-router.get('/recharge-order', adminRechargeOrderController.list);
-router.get('/recharge-order/:id', adminRechargeOrderController.getById);
-router.patch('/recharge-order/:id/pay', adminRechargeOrderController.markPaid);
-router.patch('/recharge-order/:id/refund', adminRechargeOrderController.refund);
-
-// ==================== 轮播图 ====================
-router.get('/banner', adminBannerController.list);
-router.get('/banner/:id', adminBannerController.getById);
-router.post('/banner', adminBannerController.create);
-router.put('/banner/:id', adminBannerController.update);
-router.delete('/banner/:id', adminBannerController.remove);
-router.patch('/banner/:id/toggle', adminBannerController.toggleActive);
 
 // ==================== 分类 ====================
 /**
@@ -1008,9 +733,28 @@ router.patch('/banner/:id/toggle', adminBannerController.toggleActive);
  *         schema:
  *           type: integer
  *           default: 7
+ *         description: 统计天数
  *     responses:
  *       200:
  *         description: 获取成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalRequests:
+ *                       type: integer
+ *                     avgResponseTime:
+ *                       type: number
+ *                     errorRate:
+ *                       type: number
+ *                     topUrls:
+ *                       type: array
  *
  * /admin/api-log/{id}:
  *   get:
@@ -1031,7 +775,7 @@ router.patch('/banner/:id/toggle', adminBannerController.toggleActive);
  * /admin/api-log/cleanup:
  *   delete:
  *     summary: 清理 API 日志
- *     description: 清理30天前的日志数据
+ *     description: 清理 30 天前的日志数据
  *     tags: [管理后台-API日志]
  *     security:
  *       - bearerAuth: []
@@ -1039,25 +783,3 @@ router.patch('/banner/:id/toggle', adminBannerController.toggleActive);
  *       200:
  *         description: 清理成功
  */
-router.get('/category', adminCategoryController.list);
-router.get('/category/:id', adminCategoryController.getById);
-router.post('/category', adminCategoryController.create);
-router.put('/category/:id', adminCategoryController.update);
-router.delete('/category/:id', adminCategoryController.remove);
-router.patch('/category/:id/toggle', adminCategoryController.toggleActive);
-
-// ==================== 产品 ====================
-router.get('/product', adminProductController.list);
-router.get('/product/:id', adminProductController.getById);
-router.post('/product', adminProductController.create);
-router.put('/product/:id', adminProductController.update);
-router.delete('/product/:id', adminProductController.remove);
-router.patch('/product/:id/toggle', adminProductController.toggleActive);
-
-// ==================== API 日志 ====================
-router.get('/api-log', adminApiLogController.list);
-router.get('/api-log/stats', adminApiLogController.stats);
-router.get('/api-log/:id', adminApiLogController.getById);
-router.delete('/api-log/cleanup', adminApiLogController.cleanup);
-
-module.exports = router.routes();

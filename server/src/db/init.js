@@ -289,6 +289,30 @@ async function initDatabase() {
       console.log('[DB] Default admin account inserted');
     }
 
+    // ==================== API 调用日志表 ====================
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS api_logs (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        user_id BIGINT DEFAULT NULL COMMENT '用户ID(未登录为NULL)',
+        user_info JSON COMMENT '用户信息(昵称、头像等)',
+        method VARCHAR(10) NOT NULL COMMENT 'HTTP方法',
+        url VARCHAR(500) NOT NULL COMMENT '请求URL',
+        query_params JSON COMMENT '查询参数',
+        request_body JSON COMMENT '请求体',
+        response_status INT NOT NULL COMMENT '响应状态码',
+        response_body JSON COMMENT '响应体',
+        response_time INT NOT NULL COMMENT '响应时长(毫秒)',
+        ip_address VARCHAR(50) DEFAULT '' COMMENT '客户端IP',
+        user_agent VARCHAR(500) DEFAULT '' COMMENT 'User-Agent',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        INDEX idx_user (user_id),
+        INDEX idx_method (method),
+        INDEX idx_url (url(255)),
+        INDEX idx_status (response_status),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='API调用日志表';
+    `);
+
     console.log('Database tables initialized successfully');
   } finally {
     connection.release();

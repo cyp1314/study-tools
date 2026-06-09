@@ -33,13 +33,13 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="产品图标">
-            <div class="cover-uploader" @click="triggerUpload">
-              <el-image v-if="form.coverImage" :src="form.coverImage" fit="contain" style="width:80px;height:80px" />
-              <el-icon v-else :size="30">
-                <Plus />
-              </el-icon>
-            </div>
-            <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="handleFileChange" />
+            <ImageUpload 
+              v-model="form.coverImage" 
+              :width="'80px'" 
+              :height="'80px'"
+              placeholder="点击上传图标"
+              @change="handleImageChange"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -63,10 +63,9 @@
 
 <script setup>
   import { addProduct, editProduct, getCategoryList } from '@/api/admin'
-  import { uploadImage } from '@/api/common'
   import notice from '@/utils/notice'
   import { ref, nextTick, onMounted } from 'vue'
-  import { Plus } from '@element-plus/icons-vue'
+  import ImageUpload from '@/components/Image/ImageUpload.vue'
 
   const emit = defineEmits(['success'])
   const visible = ref(false)
@@ -74,7 +73,6 @@
   let currentId = null
   const formRef = ref(null)
   const categories = ref([])
-  const fileInput = ref(null)
 
   const form = ref({
     name: '', type: '', prefix: '', suffix: '', defaultPrompt: '', description: '',
@@ -118,46 +116,9 @@
     })
   }
 
-  const triggerUpload = () => {
-    fileInput.value?.click()
-  }
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-      const base64 = event.target.result
-      try {
-        const res = await uploadImage({ image: base64 })
-        form.value.coverImage = res.data.data.url // Replace with actual domain
-        notice.success('上传成功')
-      } catch (err) {
-        notice.error('上传失败')
-      }
-    }
-    reader.readAsDataURL(file)
+  const handleImageChange = ({ key, url }) => {
+    form.value.coverImage = url
   }
 
   defineExpose({ open })
 </script>
-
-<style scoped>
-  .cover-uploader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px;
-    height: 80px;
-    border: 1px dashed #d9d9d9;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #999;
-  }
-
-  .cover-uploader:hover {
-    border-color: #409eff;
-    color: #409eff;
-  }
-</style>
