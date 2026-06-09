@@ -1,6 +1,7 @@
 const jimengService = require('../services/jimeng');
 const imageRecordService = require('../services/imageRecord');
 const qiniuUploader = require('../utils/qiniu');
+const localImageStorage = require('../utils/localImageStorage');
 const pointService = require('../services/pointService');
 const productService = require('../services/productService');
 const config = require('../config');
@@ -97,7 +98,7 @@ class ImageController {
       // 调用即梦AI生成图片
       const result = await jimengService.textToImage(fullPrompt, options);
 
-      // 上传图片到七牛云，存储 key
+      // 上传图片到七牛云，存储 key（client端使用）
       let imageKeys = [];
       if (result.images && result.images.length > 0) {
         try {
@@ -107,24 +108,38 @@ class ImageController {
         }
       }
 
+      // 保存图片到本地，存储路径（管理端使用）
+      let imagePaths = [];
+      if (result.images && result.images.length > 0) {
+        try {
+          imagePaths = await localImageStorage.saveBase64List(result.images, `jimeng/${type}`);
+        } catch (saveErr) {
+          console.error('[Image] 本地保存失败:', saveErr.message);
+        }
+      }
+
       // 更新数据库记录为成功
       if (recordId) {
         await imageRecordService.markSuccess(recordId, {
-          images: result.images || [],
-          imageKeys: qiniuUploader.getPublicUrls(imageKeys || []),
+          images: imagePaths,        // 本地文件路径（管理端）
+          imageKeys: imageKeys,      // 七牛云 key（client端）
           taskId: result.taskId || '',
         });
       }
 
-      // 生成七牛云预览URL
+      // 生成七牛云预览URL（client端使用）
       const previewUrls = imageKeys.filter(Boolean).length > 0
         ? qiniuUploader.getPublicUrls(imageKeys.filter(Boolean))
         : [];
 
-      // 只返回 recordId 和预览URL
+      // 生成本地图片URL（管理端使用）
+      const localUrls = localImageStorage.getPublicUrls(imagePaths);
+
+      // 返回 recordId、client端预览URL和管理端本地URL
       success(ctx, {
         recordId,
-        previewUrls,
+        previewUrls,    // client端：七牛云URL
+        localUrls,      // 管理端：本地服务器URL
       }, '图片生成成功');
     } catch (err) {
       // 积分退还（登录用户且非积分不足导致的失败）
@@ -293,20 +308,26 @@ class ImageController {
    */
   async _uploadAndUpdateRecord(taskId, result) {
     try {
-      // 上传图片到七牛云，存储 key
+      // 上传图片到七牛云，存储 key（client端使用）
       let imageKeys = [];
       if (result.images && result.images.length > 0) {
         imageKeys = await qiniuUploader.uploadBase64List(result.images, 'jimeng');
       }
 
+      // 保存图片到本地，存储路径（管理端使用）
+      let imagePaths = [];
+      if (result.images && result.images.length > 0) {
+        imagePaths = await localImageStorage.saveBase64List(result.images, 'jimeng');
+      }
+
       // 通过taskId查找记录并更新
-      if (imageKeys.filter(Boolean).length > 0) {
+      if (imageKeys.filter(Boolean).length > 0 || imagePaths.filter(Boolean).length > 0) {
         const pool = require('../db/mysql');
         const [rows] = await pool.query('SELECT id FROM image_records WHERE task_id = ?', [taskId]);
         if (rows.length > 0) {
           await imageRecordService.markSuccess(rows[0].id, {
-            images: result.images || [],
-            imageKeys: qiniuUploader.getPublicUrls(imageKeys || []),
+            images: imagePaths,        // 本地文件路径（管理端）
+            imageKeys: imageKeys,      // 七牛云 key（client端）
             taskId: result.taskId || '',
           });
         }

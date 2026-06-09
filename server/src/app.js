@@ -3,6 +3,8 @@ require('dotenv').config();
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa-cors');
+const serve = require('koa-static');
+const path = require('path');
 const { koaSwagger } = require('koa2-swagger-ui');
 const config = require('./config');
 const router = require('./routes/index');
@@ -39,7 +41,19 @@ app.use(bodyParser({
   formLimit: '10mb',
 }));
 
-// 5. 路由
+// 5. 静态文件服务 - 提供图片访问
+// 注意：__dirname 是 app.js 所在目录 (src)，所以 uploads 在上一级
+const uploadsPath = path.join(__dirname, '..', 'uploads');
+console.log('[Static] Uploads path:', uploadsPath);
+
+// koa-static 会将请求路径直接映射到目录
+// 请求 /uploads/images/xxx.png -> 查找 uploads/uploads/images/xxx.png (错误)
+// 所以我们需要挂载到根目录，请求时直接用 /images/xxx.png
+// 但为了保持 URL 结构，我们使用 koa-mount
+const mount = require('koa-mount');
+app.use(mount('/uploads', serve(uploadsPath, { maxage: 30 * 24 * 60 * 60 * 1000 })));
+
+// 6. 路由
 app.use(router.routes());
 app.use(router.allowedMethods());
 

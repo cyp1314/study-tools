@@ -1,3 +1,6 @@
 node_modules
 .env
 cert/
+
+# 上传的图片文件
+server/uploads/

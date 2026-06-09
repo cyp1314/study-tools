@@ -34,6 +34,7 @@
 
 <script setup>
   import { getImageRecordById } from '@/api/admin'
+  import httpRequest from '@/utils/http'
   import { ref } from 'vue'
 
   const visible = ref(false)
@@ -50,9 +51,16 @@
     imageUrls.value = []
     getImageRecordById(id).then(res => {
       detail.value = res.data.data
-      // 将 base64 数组转换为图片 URL
-      const images = res.data.data.images || []
-      imageUrls.value = images.map(base64 => `data:image/png;base64,${base64}`)
+      // 从本地路径构建图片URL（管理端）
+      const imagePaths = res.data.data.images || []
+      // images 字段现在存储的是相对路径，如 'uploads/images/jimeng/coloringBook/123.png'
+      // 使用 httpRequest.defaults.baseURL 作为服务器地址
+      const serverUrl = httpRequest.defaults.baseURL || ''
+      imageUrls.value = imagePaths.map(path => {
+        if (!path) return ''
+        // 将相对路径转为完整的访问URL
+        return `${serverUrl}/${path.replace(/\\/g, '/')}`
+      }).filter(Boolean)
       loading.value = false
     }).catch(() => { loading.value = false })
   }
