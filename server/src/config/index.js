@@ -28,6 +28,12 @@ const config = {
   wx: {
     appId: process.env.WX_MINI_APPID || '',
     appSecret: process.env.WX_MINI_SECRET || '',
+    // 微信支付配置
+    mchId: process.env.WX_MCH_ID || '', // 商户号
+    apiV3Key: process.env.WX_API_V3_KEY || '', // APIv3密钥
+    serialNo: process.env.WX_SERIAL_NO || '', // 证书序列号
+    privateKey: process.env.WX_PRIVATE_KEY || '', // 商户私钥（或私钥文件路径）
+    notifyUrl: process.env.WX_NOTIFY_URL || '', // 支付回调地址
   },
   points: {
     perGeneration: parseInt(process.env.POINTS_PER_GENERATION, 10) || 10,

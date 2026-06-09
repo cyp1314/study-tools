@@ -20,7 +20,7 @@ class WxAuthService {
       js_code: code,
       grant_type: 'authorization_code',
     };
-
+    console.log('[WxAuth] code2Session, params:', JSON.stringify(params));
     console.log('[WxAuth] code2Session, code:', code.substring(0, 10) + '...');
     const { data } = await axios.get(url, { params });
 

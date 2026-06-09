@@ -19,7 +19,8 @@
     "koa-bodyparser": "^4.4.1",
     "koa-cors": "^0.0.16",
     "mysql2": "^3.9.0",
-    "qiniu": "^7.15.2"
+    "qiniu": "^7.15.2",
+    "wechatpay-node-v3": "^2.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

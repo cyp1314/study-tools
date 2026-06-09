@@ -7,7 +7,7 @@
     </table-action>
     <el-table :data="tableData" v-loading="loading" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="60" />
-      <el-table-column prop="name" label="套餐名称" width="150" />
+      <el-table-column prop="name" label="套餐名称" />
       <el-table-column prop="points" label="积分" width="100" />
       <el-table-column prop="bonus" label="赠送积分" width="100">
         <template #default="scope">
@@ -28,15 +28,11 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="180" />
-      <el-table-column fixed="right" label="操作" min-width="220">
+      <el-table-column prop="created_at" label="创建时间" width="300" />
+      <el-table-column fixed="right" label="操作" width="180">
         <template #default="scope">
           <el-button type="primary" :link="true" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button
-            :type="scope.row.is_active ? 'warning' : 'success'"
-            :link="true"
-            @click="handleToggle(scope.row)"
-          >
+          <el-button :type="scope.row.is_active ? 'warning' : 'success'" :link="true" @click="handleToggle(scope.row)">
             {{ scope.row.is_active ? '禁用' : '启用' }}
           </el-button>
           <el-popconfirm title="确定删除该套餐？" @confirm="handleDelete(scope.row)">
@@ -53,45 +49,45 @@
 </template>
 
 <script setup name="rechargePackageIndex">
-import { ref, onMounted } from 'vue'
-import { getRechargePackageList, deleteRechargePackage, toggleRechargePackage } from '@/api/rechargePackage'
-import TableAction from '@/components/Table/TableAction.vue'
-import PackageFormDialog from './components/PackageFormDialog.vue'
-import notice from '@/utils/notice'
+  import { ref, onMounted } from 'vue'
+  import { getRechargePackageList, deleteRechargePackage, toggleRechargePackage } from '@/api/rechargePackage'
+  import TableAction from '@/components/Table/TableAction.vue'
+  import PackageFormDialog from './components/PackageFormDialog.vue'
+  import notice from '@/utils/notice'
 
-const formDialogRef = ref(null)
-const tableData = ref([])
-const loading = ref(false)
+  const formDialogRef = ref(null)
+  const tableData = ref([])
+  const loading = ref(false)
 
-const requestData = () => {
-  loading.value = true
-  getRechargePackageList().then((response) => {
-    tableData.value = response.data.data
-    loading.value = false
-  }).catch(() => {
-    loading.value = false
-  })
-}
+  const requestData = () => {
+    loading.value = true
+    getRechargePackageList().then((response) => {
+      tableData.value = response.data.data
+      loading.value = false
+    }).catch(() => {
+      loading.value = false
+    })
+  }
 
-onMounted(() => {
-  requestData()
-})
-
-const handleEdit = (row) => {
-  formDialogRef.value.open('edit', row)
-}
-
-const handleToggle = (row) => {
-  toggleRechargePackage(row.id).then(() => {
-    notice.editSuccess(row.is_active ? '已禁用' : '已启用')
+  onMounted(() => {
     requestData()
   })
-}
 
-const handleDelete = (row) => {
-  deleteRechargePackage(row.id).then(() => {
-    notice.deleteSuccess()
-    requestData()
-  })
-}
+  const handleEdit = (row) => {
+    formDialogRef.value.open('edit', row)
+  }
+
+  const handleToggle = (row) => {
+    toggleRechargePackage(row.id).then(() => {
+      notice.editSuccess(row.is_active ? '已禁用' : '已启用')
+      requestData()
+    })
+  }
+
+  const handleDelete = (row) => {
+    deleteRechargePackage(row.id).then(() => {
+      notice.deleteSuccess()
+      requestData()
+    })
+  }
 </script>

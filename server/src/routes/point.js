@@ -5,6 +5,11 @@ const pointController = require('../controllers/point');
 const router = new Router();
 
 /**
+ * 微信支付回调（无需登录）
+ */
+router.post('/recharge/notify', pointController.rechargeNotify);
+
+/**
  * 积分/签到/充值模块（需登录）
  */
 router.use(auth);

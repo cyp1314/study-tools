@@ -72,14 +72,41 @@ class PointController {
   /**
    * 创建充值订单
    * POST /api/v1/point/recharge/create
-   * Body: { packageId }
+   * Body: { packageId, openid }
    */
   async createRechargeOrder(ctx) {
     const userId = ctx.state.user.id;
-    const { packageId } = ctx.request.body;
+    const { packageId, openid } = ctx.request.body;
     if (!packageId) throw new AppError('packageId参数必填', -1, 400);
-    const result = await rechargeService.createOrder(userId, packageId);
+    const result = await rechargeService.createOrder(userId, packageId, openid);
     success(ctx, result, '订单创建成功');
+  }
+
+  /**
+   * 微信支付回调
+   * POST /api/v1/point/recharge/notify
+   */
+  async rechargeNotify(ctx) {
+    const wechatPay = require('../utils/wechatPay');
+
+    // 验证签名并解密数据
+    const notifyData = wechatPay.verifyNotify(ctx.headers, ctx.request.body);
+    if (!notifyData) {
+      ctx.status = 400;
+      ctx.body = { code: 'FAIL', message: '签名验证失败' };
+      return;
+    }
+
+    // 处理支付结果
+    const result = await rechargeService.handlePayNotify(notifyData);
+
+    if (result.success) {
+      ctx.status = 200;
+      ctx.body = { code: 'SUCCESS', message: '成功' };
+    } else {
+      ctx.status = 400;
+      ctx.body = { code: 'FAIL', message: result.message };
+    }
   }
 
   /**

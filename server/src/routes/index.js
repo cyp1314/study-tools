@@ -25,4 +25,7 @@ router.use('/common', require('./common'));
 // router.use('/error-book', require('./errorBook'));
 // router.use('/reward', require('./reward'));
 
+// 测试路由（仅开发环境使用）
+router.use('/test', require('./test'));
+
 module.exports = router;
