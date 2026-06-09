@@ -9,9 +9,13 @@ const pool = require('mysql2/promise').createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  // 添加连接验证，避免超时断开
+  // 连接保活配置
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
+  keepAliveInitialDelay: 10000, // 10秒后开始发送keepalive探测
+  // 超时配置
+  connectTimeout: 10000, // 连接超时10秒
+  // 自动重连
+  namedPlaceholders: true,
 });
 
 module.exports = pool;

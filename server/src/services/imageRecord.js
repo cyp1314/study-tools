@@ -32,6 +32,9 @@ class ImageRecordService extends BaseService {
    * @param {string[]} data.imageUrls - 七牛云URL列表
    */
   async markSuccess(id, { images, imageKeys, taskId }) {
+    if (!images || !imageKeys) throw new AppError('images和imageKeys参数必填', -1, 400);
+    console.log('markSuccess:', id, taskId, imageKeys);
+
     return this.update(id, {
       status: 'success',
       images: JSON.stringify(images || []),

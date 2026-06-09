@@ -97,6 +97,7 @@ function openUrl(url: string) {
         <wd-cell title="🔄 CI/CD 持续集成" is-link @click="navigateTo('ci')" />
         <wd-cell title="🦾  uni-ku/root" is-link @click="navigateTo('root')" />
         <wd-cell title="📊 uni-echarts" is-link @click="navigateTo('echarts')" />
+        <wd-cell title="✍️ 汉字笔画顺序" is-link @click="navigateTo('stroke-order')" />
       </wd-cell-group>
     </demo-block>
 

@@ -6,8 +6,41 @@ class BaseService {
     this.pool = pool;
   }
 
+  /**
+   * 测试数据库连接
+   */
+  async testConnection() {
+    try {
+      await this.pool.query('SELECT 1');
+      return true;
+    } catch (error) {
+      console.error('[DB] Connection test failed:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * 带重试的查询
+   */
+  async queryWithRetry(sql, values, retries = 3) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const [rows] = await this.pool.query(sql, values);
+        return rows;
+      } catch (error) {
+        lastError = error;
+        console.warn(`[DB] Query retry ${i + 1}/${retries} failed:`, error.message);
+        if (i < retries - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * (i + 1)));
+        }
+      }
+    }
+    throw lastError;
+  }
+
   async findById(id) {
-    const [rows] = await this.pool.query(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
+    const [rows] = await this.queryWithRetry(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
     return rows[0] || null;
   }
 
@@ -31,7 +64,7 @@ class BaseService {
     sql += ' ORDER BY id DESC LIMIT ? OFFSET ?';
     values.push(pageSize, offset);
 
-    const [rows] = await this.pool.query(sql, values);
+    const [rows] = await this.queryWithRetry(sql, values);
     return rows;
   }
 
@@ -51,7 +84,7 @@ class BaseService {
       sql += ' WHERE ' + whereClauses.join(' AND ');
     }
 
-    const [rows] = await this.pool.query(sql, values);
+    const [rows] = await this.queryWithRetry(sql, values);
     return rows[0].total;
   }
 
@@ -59,7 +92,7 @@ class BaseService {
     const keys = Object.keys(data);
     const values = Object.values(data);
     const placeholders = keys.map(() => '?').join(', ');
-    const [result] = await this.pool.query(
+    const [result] = await this.queryWithRetry(
       `INSERT INTO ${this.tableName} (${keys.join(', ')}) VALUES (${placeholders})`,
       values
     );
@@ -70,14 +103,14 @@ class BaseService {
     const keys = Object.keys(data);
     const values = Object.values(data);
     const setClauses = keys.map((key) => `${key} = ?`).join(', ');
-    await this.pool.query(
+    await this.queryWithRetry(
       `UPDATE ${this.tableName} SET ${setClauses} WHERE id = ?`,
       [...values, id]
     );
   }
 
   async deleteById(id) {
-    await this.pool.query(`DELETE FROM ${this.tableName} WHERE id = ?`, [id]);
+    await this.queryWithRetry(`DELETE FROM ${this.tableName} WHERE id = ?`, [id]);
   }
 }
 
