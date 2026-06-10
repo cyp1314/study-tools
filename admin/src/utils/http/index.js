@@ -4,9 +4,13 @@ import router from '@/router'
 import { ElMessage } from 'element-plus'
 import config from '@/config'
 
+// 从 window.APP_CONFIG 读取配置，如果没有则使用默认值
+const appConfig = window.APP_CONFIG || {}
+const API_BASE_URL = appConfig.API_BASE_URL || 'http://localhost:3000'
+
 const httpRequest = axios.create({
   timeout: 10000,
-  baseURL: 'http://localhost:3000'
+  baseURL: API_BASE_URL
 })
 
 httpRequest.interceptors.request.use(
